@@ -1,0 +1,17 @@
+.header__wrap {
+    text-align: center;
+    font-size: 25px;
+    font-weight: bold;
+}
+
+.body__wrap {
+    text-align: center;
+}
+
+.back__button {
+    display: block;
+    margin-top: 20px;
+    font-size: 12px;
+    color: rgb(38, 81, 207);
+    text-decoration: none;
+}

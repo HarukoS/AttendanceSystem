@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4f304055d655492b6a32a609e31c2784",
+    "content-hash": "cef08df3bce01008ad7f196bd874a1d8",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -6142,27 +6142,20 @@
         },
         {
             "name": "laravel-lang/lang",
-            "version": "8.1.3",
+            "version": "7.0.9",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Laravel-Lang/lang.git",
-                "reference": "54048d1319b211daa8ab73655b698feb09588876"
+                "reference": "679a65755db37b35acd36a5e0ca51e055815a00a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Laravel-Lang/lang/zipball/54048d1319b211daa8ab73655b698feb09588876",
-                "reference": "54048d1319b211daa8ab73655b698feb09588876",
+                "url": "https://api.github.com/repos/Laravel-Lang/lang/zipball/679a65755db37b35acd36a5e0ca51e055815a00a",
+                "reference": "679a65755db37b35acd36a5e0ca51e055815a00a",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*"
-            },
-            "require-dev": {
-                "andrey-helldar/pretty-array": "^2.3",
-                "andrey-helldar/support": "^3.4",
-                "php": "^8.0",
-                "phpunit/phpunit": "^9.5",
-                "symfony/var-dumper": "^5.2"
             },
             "suggest": {
                 "andrey-helldar/laravel-lang-publisher": "Easy installation and update of translation files for your project",
@@ -6176,8 +6169,7 @@
             ],
             "authors": [
                 {
-                    "name": "Laravel-Lang Team",
-                    "homepage": "https://github.com/Laravel-Lang"
+                    "name": "Laravel-Lang Team"
                 }
             ],
             "description": "Languages for Laravel",
@@ -6189,9 +6181,9 @@
             ],
             "support": {
                 "issues": "https://github.com/Laravel-Lang/lang/issues",
-                "source": "https://github.com/Laravel-Lang/lang"
+                "source": "https://github.com/Laravel-Lang/lang/tree/7.0.9"
             },
-            "time": "2021-04-14T17:41:45+00:00"
+            "time": "2020-11-30T20:35:41+00:00"
         },
         {
             "name": "laravel/pint",

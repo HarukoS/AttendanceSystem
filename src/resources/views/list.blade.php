@@ -39,12 +39,12 @@ List
                 <td class="table_item">{{ $data['user_name'] }}</td>
                 <td class="table_item">{{ $data['work_date'] }}</td>
                 <td class="table_item">
-                <form action="/user" method="post">
-                @csrf
-                <input type="hidden" name="user_id" value="{{$data['user_id']}}">
-                <input type="hidden" name="user_name" value="{{$data['user_name']}}">
-                <button class="detail-button_submit" type="submit">月別勤怠表</button>
-                </form>
+                    <form action="/user" method="post">
+                    @csrf
+                        <input type="hidden" name="user_id" value="{{$data['user_id']}}">
+                        <input type="hidden" name="user_name" value="{{$data['user_name']}}">
+                        <button class="detail-button_submit" type="submit">月別勤怠表</button>
+                    </form>
                 </td>
             </tr>
             @endforeach

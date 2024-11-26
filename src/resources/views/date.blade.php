@@ -55,7 +55,11 @@ Attendance
                     </td>
                     @foreach ($workSums as $workSum)
                     @if ($workSum['work_id'] === $work->id)
+                    @if ($workSum['work_time'] == null)
+                    <td class="table_item"></td>
+                    @else                       
                     <td class="table_item">{{ gmdate('H:i:s', $workSum['work_time']) }}</td>
+                    @endif
                     @endif
                     @endforeach
                 </tr>

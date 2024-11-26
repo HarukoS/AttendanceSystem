@@ -45,15 +45,23 @@ Attendance
             @foreach ($thisMonthPeriod as $thisMonthDate)
             <tr class="table_row">
                 <td class="table_item">{{ $thisMonthDate->format('d日') }}</td>
-                @foreach ($work_totals as $work_total)
-                @if ($work_total['work_date'] === $thisMonthDate->format('Y-m-d'))
-                <td class="table_item">{{ $work_total['work_start']->format('H:i:s') }}</td>
-                <td class="table_item">{{ $work_total['work_end']->format('H:i:s') }}</td>
-                <td class="table_item">{{ gmdate('H:i:s', $work_total['rest_time']) }}</td>
-                <td class="table_item">{{ gmdate('H:i:s', $work_total['work_time']) }}</td>
+                @foreach ($workSums as $workSum)
+                @if ($workSum['work_date'] === $thisMonthDate->format('Y-m-d'))
+                <td class="table_item">{{ $workSum['work_start']->format('H:i:s') }}</td>
+                @if ($workSum['work_end'] !== null)
+                <td class="table_item">{{ $workSum['work_end']->format('H:i:s') }}</td>
+                @else
+                <td class="table_item"></td>
+                @endif
+                <td class="table_item">{{ gmdate('H:i:s', $workSum['rest_time']) }}</td>
+                @if ($workSum['work_time'] !== null)
+                <td class="table_item">{{ gmdate('H:i:s', $workSum['work_time']) }}</td>
+                @else
+                <td class="table_item"></td>
+                @endif
                 @endif
                 @endforeach
-                @if (!(in_array($thisMonthDate->format('Y-m-d'), array_column($work_totals, 'work_date'))))
+                @if (!(in_array($thisMonthDate->format('Y-m-d'), array_column($workSums, 'work_date'))))
                 <td class="table_item">-</td>
                 <td class="table_item">-</td>
                 <td class="table_item">-</td>

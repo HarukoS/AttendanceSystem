@@ -24,6 +24,7 @@
 ## テーブル設計
 
 ## ER図
+![er drawio](https://github.com/user-attachments/assets/14637e0c-5629-4e98-9e8c-23442c39b5ec)
 
 ## 環境構築
 

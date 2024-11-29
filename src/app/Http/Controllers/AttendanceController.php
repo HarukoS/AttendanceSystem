@@ -72,10 +72,6 @@ class AttendanceController extends Controller
         $work = Work::where('user_id', $user_id)
             ->where('date', $today)
             ->first();
-    
-        $rest = Rest::where('user_id', $user_id)
-            ->where('date', $today)
-            ->latest();
 
         //休憩開始
         if ($request->has('rest_start')) {  
@@ -429,7 +425,7 @@ class AttendanceController extends Controller
             }
             if (array_key_exists($id, $restSums)) {
             } else {
-                $workSums[] = ['work_id' => $id, 'work_date' => $work_date, 'work_start' => $work_start, 'work_end' => $work_end, 'rest_time' => $rest_totalSum, 'work_time' => $work_total_time];
+                $workSums[] = ['work_id' => $id, 'work_date' => $work_date, 'work_start' => $work_start, 'work_end' => $work_end, 'rest_time' => null, 'work_time' => $work_total_time];
             }
         }
 
@@ -523,7 +519,7 @@ class AttendanceController extends Controller
             }
             if (array_key_exists($id, $restSums)) {
             } else {
-                $workSums[] = ['work_id' => $id, 'work_date' => $work_date, 'work_start' => $work_start, 'work_end' => $work_end, 'rest_time' => $rest_totalSum, 'work_time' => $work_total_time];
+                $workSums[] = ['work_id' => $id, 'work_date' => $work_date, 'work_start' => $work_start, 'work_end' => $work_end, 'rest_time' => null, 'work_time' => $work_total_time];
             }
         }
 

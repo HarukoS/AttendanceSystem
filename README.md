@@ -1,4 +1,4 @@
-# Atte Attendance System
+# "Atte" Attendance System
     勤怠管理システム「Atte」
 
 ## 作成した目的

@@ -51,13 +51,17 @@ Attendance
                 @if ($workSum['work_end'] !== null)
                 <td class="table_item">{{ $workSum['work_end']->format('H:i:s') }}</td>
                 @else
-                <td class="table_item"></td>
+                <td class="table_item">-</td>
                 @endif
+                @if ($workSum['rest_time'] !== null)
                 <td class="table_item">{{ gmdate('H:i:s', $workSum['rest_time']) }}</td>
+                @else
+                <td class="table_item">-</td>
+                @endif
                 @if ($workSum['work_time'] !== null)
                 <td class="table_item">{{ gmdate('H:i:s', $workSum['work_time']) }}</td>
                 @else
-                <td class="table_item"></td>
+                <td class="table_item">-</td>
                 @endif
                 @endif
                 @endforeach

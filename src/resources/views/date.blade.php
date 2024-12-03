@@ -47,21 +47,25 @@ Attendance
                     <td class="table_item">{{ $work->work_start }}</td>
                     <td class="table_item">{{ $work->work_end }}</td>
                     <td class="table_item">
-                    @foreach ($restSums as $key => $restSum)
-                    @if ($key === $work->id)
-                    {{ gmdate('H:i:s', $restSum) }}
+                    @foreach ($workSums as $workSum)
+                    @if ($workSum['work_id'] === $work->id)
+                    @if ($workSum['rest_time'] == null)
+                    @else
+                    {{ gmdate('H:i:s', $workSum['rest_time']) }}
+                    @endif
                     @endif
                     @endforeach
                     </td>
+                    <td class="table_item">
                     @foreach ($workSums as $workSum)
                     @if ($workSum['work_id'] === $work->id)
                     @if ($workSum['work_time'] == null)
-                    <td class="table_item"></td>
                     @else                       
-                    <td class="table_item">{{ gmdate('H:i:s', $workSum['work_time']) }}</td>
+                    {{ gmdate('H:i:s', $workSum['work_time']) }}
                     @endif
                     @endif
                     @endforeach
+                    </td>
                 </tr>
                 @endif
             @endforeach

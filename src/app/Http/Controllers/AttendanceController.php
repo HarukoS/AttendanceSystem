@@ -41,10 +41,6 @@ class AttendanceController extends Controller
         if ($request->has('work_end')) {
 
             //退勤打刻の際に、その日の出勤データがない場合、前日の勤務終了時刻に"23:59:59"を入力し、当日の勤務データを新規作成し、勤務開始時刻に"00:00:00"を入れ、勤務終了に現在の時刻を入れる
-            /**
-             * 
-             * 
-             */
             if (!$work_date) {
                 Work::where('user_id', $user->id)
                     ->where('date', $yesterday)
@@ -157,67 +153,9 @@ class AttendanceController extends Controller
             ->whereDate('date', $date)
             ->paginate(5);
 
-        //1勤務あたりの拘束時間
-        $work_totals = [];
-        foreach ($works as $work) {
-            $id = $work->id;
-            $work_start = \Carbon\Carbon::parse($work->work_start);
-            $work_end = \Carbon\Carbon::make($work->work_end);
-            if ($work_end == null) {
-                $work_totals[] = ['id' => $id, 'work_time' => null];
-            } else {
-                $work_time = $work_end->diffInSeconds($work_start);
-                $work_totals[] = ['id' => $id, 'work_time' => $work_time];
-            }
-        }
-           
-        //各休憩時間
-        $rests = Rest::all();
-        $rest_totals = [];
-        foreach ($rests as $rest) {
-            $work_id = $rest->work_id;
-            $start = \Carbon\Carbon::parse($rest->rest_start);
-            $end = \Carbon\Carbon::parse($rest->rest_end);
-            $rest_time = $end->diffInSeconds($start);
-            $rest_totals[] = ['work_id' => $work_id, 'rest_time' => $rest_time];
-        }
+        $workSums = $this->getWorkRestTime($works);
 
-        //1日あたりの合計休憩時間
-        $restSums = [];
-        foreach ($rest_totals as $rest_total){
-            $work_id = $rest_total['work_id'];
-            $rest_totalSum = $rest_total['rest_time'];
-
-        if (!isset($restSums[$work_id])) {
-            $restSums[$work_id] = 0;
-        }
-
-        $restSums[$work_id] += $rest_totalSum;
-        }
-
-        //1日あたりの合計勤務時間（拘束時間-合計休憩時間）
-        $workSums = [];
-        foreach ($work_totals as $work_total){
-            $id = $work_total['id'];
-            $work_total_time = $work_total['work_time'];
-            
-            foreach ($restSums as $key => $rest_totalSum) {
-                if ($key === $id){
-                    if ($work_total_time == null){
-                        $workSums[] = ['work_id' => $id, 'work_time' => null];
-                    } else {
-                        $workMinusRest = $work_total_time - $rest_totalSum;
-                        $workSums[] = ['work_id' => $id, 'work_time' => $workMinusRest];
-                    }
-                }
-            }
-            if (array_key_exists($id, $restSums)) {
-            } else {
-            $workSums [] = ['work_id' => $id, 'work_time' => $work_total_time];             
-            }
-        }
-
-        return view('date', compact('works', 'work_totals', 'work_id', 'rest_totals', 'date', 'restSums', 'workSums'));
+        return view('date', compact('works', 'date', 'workSums'));
     }
 
     //日付一覧ページ（日付の変更）
@@ -237,67 +175,9 @@ class AttendanceController extends Controller
             ->whereDate('date', $date)
             ->paginate(5);
 
-        //1勤務あたりの拘束時間
-        $work_totals = [];
-        foreach ($works as $work){
-            $id = $work->id;
-            $work_start = \Carbon\Carbon::parse($work->work_start);
-            $work_end = \Carbon\Carbon::make($work->work_end);
-            if ($work_end == null) {
-                $work_totals[] = ['id' => $id, 'work_time' => null];
-            } else {
-                $work_time = $work_end->diffInSeconds($work_start);
-                $work_totals[] = ['id' => $id, 'work_time' => $work_time];
-            }
-        }
-    
-        //各休憩時間
-        $rests = Rest::all();
-        $rest_totals = [];
-        foreach ($rests as $rest){
-            $work_id = $rest->work_id;
-            $start = \Carbon\Carbon::parse($rest->rest_start);
-            $end = \Carbon\Carbon::parse($rest->rest_end);
-            $rest_time = $end->diffInSeconds($start);
-            $rest_totals[] = ['work_id' => $work_id, 'rest_time' => $rest_time];
-        }
+        $workSums = $this->getWorkRestTime($works);
 
-        //1日あたりの合計休憩時間
-        $restSums = [];
-        foreach ($rest_totals as $rest_total){
-            $work_id = $rest_total['work_id'];
-            $rest_totalSum = $rest_total['rest_time'];
-
-            if(!isset($restSums[$work_id])) {
-            $restSums[$work_id] = 0;
-            }
-
-            $restSums[$work_id] += $rest_totalSum;
-        }
-
-        //1日あたりの合計勤務時間（拘束時間-合計休憩時間）
-        $workSums = [];
-        foreach ($work_totals as $work_total) {
-            $id = $work_total['id'];
-            $work_total_time = $work_total['work_time'];
-
-            foreach ($restSums as $key => $rest_totalSum) {
-                if ($key === $id) {
-                    if ($work_total_time == null) {
-                        $workSums[] = ['work_id' => $id, 'work_time' => null];
-                    } else {
-                        $workMinusRest = $work_total_time - $rest_totalSum;
-                        $workSums[] = ['work_id' => $id, 'work_time' => $workMinusRest];
-                    }
-                }
-            }
-            if (array_key_exists($id, $restSums)) {
-            } else {
-                $workSums[] = ['work_id' => $id, 'work_time' => $work_total_time];
-            }
-        }
-
-        return view('date', compact('works', 'work_totals', 'work_id', 'rest_totals', 'date', 'restSums', 'workSums'));
+        return view('date', compact('works', 'date', 'workSums'));
     }
 
     //ユーザー一覧ページ
@@ -366,68 +246,7 @@ class AttendanceController extends Controller
         $request_user = $request->all(); 
         $works = Work::with('user', 'rests')->UserSearch($request->user_id)->get();
 
-        //各休憩時間
-        $rests = Rest::all();
-        $rest_totals = [];
-        foreach ($rests as $rest) {
-            $work_id = $rest->work_id;
-            $start = \Carbon\Carbon::parse($rest->rest_start);
-            $end = \Carbon\Carbon::parse($rest->rest_end);
-            $rest_time = $end->diffInSeconds($start);
-            $rest_totals [] = ['work_id' => $work_id, 'rest_time' => $rest_time];
-        }
-
-        //1日あたりの合計休憩時間
-        $restSums = [];
-        foreach ($rest_totals as $rest_total) {
-            $work_id = $rest_total['work_id'];
-            $rest_totalSum = $rest_total['rest_time'];
-        if (!isset($restSums[$work_id])) {
-            $restSums[$work_id] = 0;
-        }
-        $restSums[$work_id] += $rest_totalSum;
-        }
-
-        //1勤務あたりの拘束時間
-        $work_totals = [];
-        foreach ($works as $work) {
-            $id = $work->id;
-            $work_start = \Carbon\Carbon::parse($work->work_start);
-            $work_end = \Carbon\Carbon::make($work->work_end);
-            $work_date = $work->date;
-            if ($work_end == null) {
-                $work_totals[] = ['id' => $id, 'work_date' => $work_date, 'work_start' => $work_start, 'work_end' => $work_end, 'work_time' => null];
-            } else {
-                $work_time = $work_end->diffInSeconds($work_start);
-                $work_totals[] = ['id' => $id, 'work_date' => $work_date, 'work_start' => $work_start, 'work_end' => $work_end, 'work_time' => $work_time];
-            }
-        }
-
-        //1日あたりの合計勤務時間（拘束時間-合計休憩時間）
-        $workSums = [];
-        foreach ($work_totals as $work_total) {
-            $id = $work_total['id'];
-            $work_total_time = $work_total['work_time'];
-            $work_date = $work_total['work_date'];
-            $work_start = $work_total['work_start'];
-            $work_end = $work_total['work_end'];
-
-            foreach ($restSums as $key => $rest_totalSum) {
-                $rest_time = $rest_totalSum;
-                if ($key === $id) {
-                    if ($work_total_time == null) {
-                        $workSums[] = ['work_id' => $id, 'work_date' => $work_date,'work_start' => $work_start, 'work_end' => $work_end, 'rest_time' => $rest_totalSum, 'work_time' => null];
-                    } else {
-                        $workMinusRest = $work_total_time - $rest_totalSum;
-                        $workSums[] = ['work_id' => $id, 'work_date' => $work_date,'work_start' => $work_start, 'work_end' => $work_end, 'rest_time' => $rest_totalSum, 'work_time' => $workMinusRest];
-                    }
-                }
-            }
-            if (array_key_exists($id, $restSums)) {
-            } else {
-                $workSums[] = ['work_id' => $id, 'work_date' => $work_date, 'work_start' => $work_start, 'work_end' => $work_end, 'rest_time' => null, 'work_time' => $work_total_time];
-            }
-        }
+        $workSums = $this->getWorkRestTime($works);
 
         // 当月を取得
         $year = Carbon::today()->format('Y');
@@ -450,6 +269,8 @@ class AttendanceController extends Controller
         $request_user = $request->all();
         $works = Work::with('user', 'rests')->UserSearch($request->user_id)->get();
 
+        $workSums = $this->getWorkRestTime($works);
+
         $thisMonth = Carbon::parse($request->input('month'));
 
         if ($request->has('prevMonth')) {
@@ -459,69 +280,6 @@ class AttendanceController extends Controller
         if ($request->has('nextMonth')) {
             $thisMonth->addMonth();
         }   
-
-        //各休憩時間
-        $rests = Rest::all();
-        $rest_totals = [];
-        foreach ($rests as $rest) {
-            $work_id = $rest->work_id;
-            $start = \Carbon\Carbon::parse($rest->rest_start);
-            $end = \Carbon\Carbon::parse($rest->rest_end);
-            $rest_time = $end->diffInSeconds($start);
-            $rest_totals [] = ['work_id' => $work_id, 'rest_time' => $rest_time];
-        }
-
-        //1日あたりの合計休憩時間
-        $restSums = [];
-        foreach ($rest_totals as $rest_total) {
-            $work_id = $rest_total['work_id'];
-            $rest_totalSum = $rest_total['rest_time'];
-            if (!isset($restSums[$work_id])) {
-                $restSums[$work_id] = 0;
-            }
-        $restSums[$work_id] += $rest_totalSum;
-        }
-
-        //1勤務あたりの拘束時間
-        $work_totals = [];
-        foreach ($works as $work) {
-            $id = $work->id;
-            $work_start = \Carbon\Carbon::parse($work->work_start);
-            $work_end = \Carbon\Carbon::make($work->work_end);
-            $work_date = $work->date;
-            if ($work_end == null) {
-                $work_totals[] = ['id' => $id, 'work_date' => $work_date, 'work_start' => $work_start, 'work_end' => $work_end, 'work_time' => null];
-            } else {
-                $work_time = $work_end->diffInSeconds($work_start);
-                $work_totals[] = ['id' => $id, 'work_date' => $work_date, 'work_start' => $work_start, 'work_end' => $work_end, 'work_time' => $work_time];
-            }
-        }
-
-        //1日あたりの合計勤務時間（拘束時間-合計休憩時間）
-        $workSums = [];
-        foreach ($work_totals as $work_total) {
-            $id = $work_total['id'];
-            $work_total_time = $work_total['work_time'];
-            $work_date = $work_total['work_date'];
-            $work_start = $work_total['work_start'];
-            $work_end = $work_total['work_end'];
-
-            foreach ($restSums as $key => $rest_totalSum) {
-                $rest_time = $rest_totalSum;
-                if ($key === $id) {
-                    if ($work_total_time == null) {
-                        $workSums[] = ['work_id' => $id, 'work_date' => $work_date, 'work_start' => $work_start, 'work_end' => $work_end, 'rest_time' => $rest_totalSum, 'work_time' => null];
-                    } else {
-                        $workMinusRest = $work_total_time - $rest_totalSum;
-                        $workSums[] = ['work_id' => $id, 'work_date' => $work_date, 'work_start' => $work_start, 'work_end' => $work_end, 'rest_time' => $rest_totalSum, 'work_time' => $workMinusRest];
-                    }
-                }
-            }
-            if (array_key_exists($id, $restSums)) {
-            } else {
-                $workSums[] = ['work_id' => $id, 'work_date' => $work_date, 'work_start' => $work_start, 'work_end' => $work_end, 'rest_time' => null, 'work_time' => $work_total_time];
-            }
-        }
 
         // 当月の期間を取得
         $thisMonthPeriod = $this->getThisMonthPeriod($thisMonth);
@@ -542,5 +300,75 @@ class AttendanceController extends Controller
         $end = $thisMonth->copy()->endOfMonth();
         // 月初～月末の期間を取得
         return CarbonPeriod::create($start->format('Y-m-d'), $end->format('Y-m-d'))->toArray();
+    }
+
+    //合計勤務時間＆休憩時間
+    private function getWorkRestTime($works)
+    {
+        //1勤務あたりの拘束時間
+        $work_totals = [];
+        foreach ($works as $work) {
+            $id = $work->id;
+            $work_date = $work->date;
+            $work_start = \Carbon\Carbon::parse($work->work_start);
+            $work_end = \Carbon\Carbon::make($work->work_end);
+                
+            if ($work_end == null) {
+                $work_totals[] = ['id' => $id, 'work_date' => $work_date, 'work_start' => $work_start, 'work_end' => $work_end, 'work_time' => null];
+            } else {
+                $work_time = $work_end->diffInSeconds($work_start);
+                $work_totals[] = ['id' => $id,'work_date' => $work_date,'work_start' => $work_start, 'work_end' => $work_end, 'work_time' => $work_time];
+            }
+        }
+
+        //各休憩時間
+        $rests = Rest::all();
+        $rest_totals = [];
+        foreach ($rests as $rest) {
+            $work_id = $rest->work_id;
+            $start = \Carbon\Carbon::parse($rest->rest_start);
+            $end = \Carbon\Carbon::parse($rest->rest_end);
+            $rest_time = $end->diffInSeconds($start);
+            $rest_totals[] = ['work_id' => $work_id, 'rest_time' => $rest_time];
+        }
+
+        //1日あたりの合計休憩時間
+        $restSums = [];
+        foreach ($rest_totals as $rest_total) {
+            $work_id = $rest_total['work_id'];
+            $rest_totalSum = $rest_total['rest_time'];
+
+            if (!isset($restSums[$work_id])) {
+                $restSums[$work_id] = 0;
+            }
+
+            $restSums[$work_id] += $rest_totalSum;
+        }
+
+        //1日あたりの合計勤務時間（拘束時間-合計休憩時間）
+        $workSums = [];
+        foreach ($work_totals as $work_total) {
+            $id = $work_total['id'];
+            $work_total_time = $work_total['work_time'];
+            $work_date = $work_total['work_date'];
+            $work_start = $work_total['work_start'];
+            $work_end = $work_total['work_end'];
+
+            foreach ($restSums as $key => $rest_totalSum) {
+                if ($key === $id) {
+                    if ($work_total_time == null) {
+                        $workSums[] = ['work_id' => $id, 'work_date' => $work_date,'work_start' => $work_start, 'work_end' => $work_end, 'rest_time' => $rest_totalSum, 'work_time' => null];
+                    } else {
+                        $workMinusRest = $work_total_time - $rest_totalSum;
+                        $workSums[] = ['work_id' => $id,'work_date' => $work_date,'work_start' => $work_start, 'work_end' => $work_end, 'rest_time' => $rest_totalSum, 'work_time' => $workMinusRest];
+                    }
+                }
+            }
+            if (array_key_exists($id, $restSums)) {
+            } else {
+                $workSums[] = ['work_id' => $id,'work_date' => $work_date,'work_start' => $work_start, 'work_end' => $work_end, 'rest_time' => null, 'work_time' => $work_total_time];
+            }
+        }
+        return $workSums;
     }
 }

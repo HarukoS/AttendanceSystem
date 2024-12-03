@@ -47,7 +47,8 @@ Attendance
                 <td class="table_item">{{ $thisMonthDate->format('d日') }}</td>
                 @foreach ($workSums as $workSum)
                 @if ($workSum['work_date'] === $thisMonthDate->format('Y-m-d'))
-                <td class="table_item">{{ $workSum['work_start']->format('H:i:s') }}</td>
+                <td class="table_item">{{ $workSum['work_start'
+                    ]->format('H:i:s') }}</td>
                 @if ($workSum['work_end'] !== null)
                 <td class="table_item">{{ $workSum['work_end']->format('H:i:s') }}</td>
                 @else

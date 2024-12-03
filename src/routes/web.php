@@ -64,12 +64,12 @@ Route::middleware('auth')->group(function () {
   Route::get('/list', [AttendanceController::class, 'list']);
 });
 
-//ユーザー毎勤怠表ページ
+//ユーザー別勤怠表ページ
 Route::middleware('auth')->group(function () {
   Route::post('/user', [AttendanceController::class, 'user']);
 });
 
-//ユーザー毎勤怠表ページ（表示月の変更）
+//ユーザー別勤怠表ページ（表示月の変更）
 Route::middleware('auth')->group(function () {
   Route::get('/userChangeMonth', [AttendanceController::class, 'userChangeMonth']);
 });

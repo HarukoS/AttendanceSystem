@@ -21,6 +21,7 @@
     - MySQL 8.0
 
 ## テーブル設計
+<img width="431" alt="テーブル仕様書" src="https://github.com/user-attachments/assets/8b28bad9-a67d-4f4d-9742-e3ec37089671">
 
 ## ER図
 ![](er.drawio.png)
